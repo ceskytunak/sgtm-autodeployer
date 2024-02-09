@@ -54,6 +54,12 @@ resource "google_cloud_run_service" "server-side-tagging-preview" {
     spec {
       containers {
         image = "gcr.io/cloud-tagging-10302018/gtm-cloud-image:stable"
+        resources {
+          limits = {
+            memory = "256Mi"
+            cpu = 1
+          }
+        }
         env {
           name  = "RUN_AS_PREVIEW_SERVER"
           value = "true"
@@ -70,7 +76,7 @@ resource "google_cloud_run_service" "server-side-tagging-preview" {
         "autoscaling.knative.dev/maxScale"  = 1
         "autoscaling.knative.dev/minScale"  = 0
         "run.googleapis.com/client-name"    = "terraform"
-        "run.googleapis.com/cpu-throttling" = false
+        "run.googleapis.com/cpu-throttling" = true
       }
     }
   }
@@ -103,6 +109,12 @@ resource "google_cloud_run_service" "server-side-tagging" {
     spec {
       containers {
         image = "gcr.io/cloud-tagging-10302018/gtm-cloud-image:stable"
+        resources {
+          limits = {
+            memory = "512Mi"
+            cpu = 1
+          }
+        }
         env {
           name = "PREVIEW_SERVER_URL"
           value = google_cloud_run_service.server-side-tagging-preview.status[0].url
@@ -119,7 +131,7 @@ resource "google_cloud_run_service" "server-side-tagging" {
         "autoscaling.knative.dev/maxScale"  = var.max_instances
         "autoscaling.knative.dev/minScale"  = var.min_instances
         "run.googleapis.com/client-name"    = "terraform"
-        "run.googleapis.com/cpu-throttling" = false
+        "run.googleapis.com/cpu-throttling" = true
       }
     }
   }
